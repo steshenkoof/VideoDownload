@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "app_proxy.py",
+      "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb"
@@ -11,13 +11,17 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/(.*)",
-      "dest": "app_proxy.py"
+      "dest": "api/index.py"
     }
   ],
   "functions": {
-    "app_proxy.py": {
-      "maxDuration": 300
+    "api/index.py": {
+      "maxDuration": 10
     }
   },
   "env": {

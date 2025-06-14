@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Downloader - Vercel Edition</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 1.1rem;
+      }
+
+      .warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #856404;
+      }
+
+      .warning h4 {
+        margin-bottom: 10px;
+        color: #d63031;
+      }
+
+      .warning ul {
+        margin-left: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-container {
+        position: relative;
+        display: flex;
+        gap: 10px;
+      }
+
+      .url-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .url-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .result {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        display: none;
+      }
+
+      .result.success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+
+      .result.error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+
+      .video-info {
+        margin-top: 15px;
+      }
+
+      .video-info h4 {
+        margin-bottom: 10px;
+      }
+
+      .direct-link {
+        background: #e9ecef;
+        padding: 10px;
+        border-radius: 8px;
+        word-break: break-all;
+        font-family: monospace;
+        margin-top: 10px;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .platform-badges {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .badge-youtube {
+        background: #ff0000;
+        color: white;
+      }
+      .badge-tiktok {
+        background: #000000;
+        color: white;
+      }
+      .badge-instagram {
+        background: #e4405f;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="title">📱 Video Downloader</h1>
+        <p class="subtitle">Vercel Edition - Получение прямых ссылок</p>
+      </div>
+
+      <div class="warning">
+        <h4>⚠️ Ограничения Vercel версии:</h4>
+        <ul>
+          <li>Время выполнения: максимум 10 секунд</li>
+          <li>Предоставляются только прямые ссылки для скачивания</li>
+          <li>Нет возможности скачать файл напрямую</li>
+          <li>Может не работать с заблокированными платформами</li>
+        </ul>
+      </div>
+
+      <div class="platform-badges">
+        <span class="badge badge-youtube">YouTube</span>
+        <span class="badge badge-tiktok">TikTok</span>
+        <span class="badge badge-instagram">Instagram</span>
+      </div>
+
+      <form id="downloadForm">
+        <div class="input-group">
+          <div class="input-container">
+            <input
+              type="url"
+              id="videoUrl"
+              class="url-input"
+              placeholder="Вставьте ссылку на видео (YouTube, TikTok, Instagram)"
+              required
+            />
+            <button type="submit" class="btn btn-primary">
+              🔍 Получить ссылку
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Получение информации о видео...</p>
+      </div>
+
+      <div class="result" id="result"></div>
+
+      <div style="text-align: center; margin-top: 30px; color: #666">
+        <p>
+          💡 <strong>Рекомендация:</strong> Для полного функционала используйте
+          <a
+            href="https://github.com/steshenkoof/VideoDownload"
+            target="_blank"
+            style="color: #667eea"
+            >Railway или другой хостинг</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("downloadForm");
+      const loading = document.getElementById("loading");
+      const result = document.getElementById("result");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const url = document.getElementById("videoUrl").value.trim();
+        if (!url) return;
+
+        // Показать загрузку
+        loading.style.display = "block";
+        result.style.display = "none";
+
+        try {
+          const response = await fetch("/api/download", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ url: url }),
+          });
+
+          const data = await response.json();
+
+          loading.style.display = "none";
+          result.style.display = "block";
+
+          if (data.success) {
+            result.className = "result success";
+            result.innerHTML = `
+                        <h4>✅ Успешно получена ссылка!</h4>
+                        <div class="video-info">
+                            <p><strong>Название:</strong> ${data.title}</p>
+                            <p><strong>Платформа:</strong> ${data.platform}</p>
+                            ${data.note ? `<p><em>${data.note}</em></p>` : ""}
+                            <div class="direct-link">
+                                <strong>Прямая ссылка для скачивания:</strong><br>
+                                <a href="${
+                                  data.direct_url
+                                }" target="_blank" download>
+                                    ${data.direct_url.substring(0, 100)}...
+                                </a>
+                            </div>
+                            <p style="margin-top: 10px;">
+                                <small>💡 Кликните по ссылке выше или скопируйте её в менеджер загрузок</small>
+                            </p>
+                        </div>
+                    `;
+          } else {
+            result.className = "result error";
+            result.innerHTML = `
+                        <h4>❌ Ошибка</h4>
+                        <p>${data.error}</p>
+                        ${
+                          data.suggestion
+                            ? `<p><em>💡 ${data.suggestion}</em></p>`
+                            : ""
+                        }
+                        <p style="margin-top: 10px;">
+                            <strong>Возможные решения:</strong><br>
+                            • Используйте VPN<br>
+                            • Попробуйте другую ссылку<br>
+                            • Используйте полную версию на Railway
+                        </p>
+                    `;
+          }
+        } catch (error) {
+          loading.style.display = "none";
+          result.style.display = "block";
+          result.className = "result error";
+          result.innerHTML = `
+                    <h4>❌ Ошибка сети</h4>
+                    <p>Не удалось подключиться к серверу: ${error.message}</p>
+                    <p><em>Попробуйте обновить страницу или использовать VPN</em></p>
+                `;
+        }
+      });
+    </script>
+  </body>
+</html>
