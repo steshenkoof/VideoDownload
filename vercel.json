@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app_proxy.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app_proxy.py"
+    }
+  ],
+  "functions": {
+    "app_proxy.py": {
+      "maxDuration": 300
+    }
+  },
+  "env": {
+    "PYTHONPATH": "/var/task"
+  }
+}
