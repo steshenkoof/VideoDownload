@@ -105,9 +105,15 @@
         font-weight: 600;
       }
 
+      .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
       .input-group input {
         width: 100%;
-        padding: 15px 20px;
+        padding: 15px 50px 15px 20px;
         border: 2px solid #e1e5e9;
         border-radius: 12px;
         font-size: 1em;
@@ -120,6 +126,33 @@
         border-color: #667eea;
         background: white;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .clear-btn {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        font-size: 14px;
+        display: none;
+        z-index: 10;
+        transition: all 0.3s ease;
+      }
+
+      .clear-btn:hover {
+        background: #c82333;
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      .clear-btn.show {
+        display: block;
       }
 
       .btn {
@@ -273,13 +306,23 @@
       <form id="downloadForm">
         <div class="input-group">
           <label for="videoUrl">Вставьте ссылку на видео:</label>
-          <input
-            type="url"
-            id="videoUrl"
-            name="videoUrl"
-            placeholder="https://www.youtube.com/watch?v=..."
-            required
-          />
+          <div class="input-container">
+            <input
+              type="url"
+              id="videoUrl"
+              name="videoUrl"
+              placeholder="https://www.youtube.com/watch?v=..."
+              required
+            />
+            <button
+              type="button"
+              class="clear-btn"
+              id="clearBtn"
+              title="Очистить поле"
+            >
+              ✕
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn" id="downloadBtn">
           Скачать видео
@@ -296,6 +339,33 @@
       const result = document.getElementById("result");
       const downloadBtn = document.getElementById("downloadBtn");
       const videoUrlInput = document.getElementById("videoUrl");
+      const clearBtn = document.getElementById("clearBtn");
+
+      // Показать/скрыть кнопку очистки
+      function toggleClearButton() {
+        if (videoUrlInput.value.trim()) {
+          clearBtn.classList.add("show");
+        } else {
+          clearBtn.classList.remove("show");
+        }
+      }
+
+      // Очистка поля ввода
+      function clearInput() {
+        videoUrlInput.value = "";
+        clearBtn.classList.remove("show");
+        videoUrlInput.focus();
+        hideResult();
+      }
+
+      // События для поля ввода
+      videoUrlInput.addEventListener("input", toggleClearButton);
+      videoUrlInput.addEventListener("paste", () => {
+        setTimeout(toggleClearButton, 100);
+      });
+
+      // Событие для кнопки очистки
+      clearBtn.addEventListener("click", clearInput);
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -323,6 +393,7 @@
 
           if (data.success) {
             showSuccessResult(data);
+            // Убрали автоматическую очистку - теперь только ручная через крестик
           } else {
             showResult(
               data.error || "Произошла ошибка при скачивании",
