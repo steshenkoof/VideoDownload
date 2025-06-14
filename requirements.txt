@@ -1,0 +1,8 @@
+Flask==2.3.3
+yt-dlp==2023.9.24
+requests==2.31.0
+python-telegram-bot==20.6
+instaloader==4.10.3
+validators==0.22.0
+python-dotenv==1.0.0
+gunicorn==21.2.0 
